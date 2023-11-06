@@ -206,7 +206,6 @@ function App() {
 
         setLayout(resultA)
         window.localStorage.setItem('layout', JSON.stringify(resultA))
-
       }}>
         <Droppable droppableId="left">
           {(droppableProvided, droppableSnapshot) => (
@@ -219,7 +218,7 @@ function App() {
                 (layout['left'])
                   // .sort((a, b) => entryAIndex - entryBIndex)
                   .map((widget, index) =>
-                    <Draggable key={widget} draggableId={widget} index={index} isDragDisabled={true}>
+                    <Draggable key={widget} draggableId={widget} index={index} isDragDisabled={false}>
                       {(draggableProvided, draggableSnapshot) => (
                         <div
 
@@ -238,7 +237,7 @@ function App() {
                             React.createElement(WidgetsComponents[widget as keyof typeof WidgetsComponents], {
                               updatesHeap: updatesHeap.current,
                               layoutUpdate: layoutUpdate,
-                              settings: true,
+                              // settings: true,
                             })
                           }
                         </div>
@@ -268,7 +267,7 @@ function App() {
                 (layout['right'])
                   // .sort((a, b) => entryAIndex - entryBIndex)
                   .map((widget, index) =>
-                    <Draggable key={widget} draggableId={widget} index={index} isDragDisabled={true}>
+                    <Draggable key={widget} draggableId={widget} index={index} isDragDisabled={false}>
                       {(draggableProvided, draggableSnapshot) => (
                         <div
                           {
@@ -286,7 +285,7 @@ function App() {
                             React.createElement(WidgetsComponents[widget as keyof typeof WidgetsComponents], {
                               updatesHeap: updatesHeap.current,
                               layoutUpdate: layoutUpdate,
-                              settings: true,
+                              // settings: true,
                               // className: 'max-w-md mx-auto',
                             })
                           }

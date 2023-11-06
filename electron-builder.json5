@@ -1,0 +1,24 @@
+/**
+ * @see https://www.electron.build/configuration/configuration
+ */
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.nikkitin.smotrite",
+  "asar": true,
+  "productName": "Smotrite",
+  "directories": {
+    "output": "release/${version}"
+  },
+  "buildVersion": "0.0.1",
+  "copyright": "Luka Nikitin",
+  "files": [
+    "dist",
+    "dist-electron"
+  ],
+  "mac": {
+    "target": [
+      "dmg"
+    ],
+    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+  },
+}

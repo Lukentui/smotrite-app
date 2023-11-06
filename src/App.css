@@ -1,0 +1,191 @@
+body {
+    /* background: #fafbfc; */
+    background: #eef1f4;
+    overflow: hidden;
+}
+
+.global-frame-layout {
+    height: 100vh;
+    width: 100vw;
+}
+
+.frame-part-backdrop {
+    height: 56px;
+    width: 100vw;
+    background: #fff;
+    /* position: absolute;
+    top: 0px;
+    left: 0px; */
+}
+
+.global-frame-layout .frame-part {
+    height: 56px;
+    position: fixed;
+    width: 100vw;
+    z-index: 99999999999;
+}
+
+.global-frame-layout .app-part {
+    height: 100vh;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.global-frame-layout .app-part::-webkit-scrollbar{
+    display: none !important;
+    width: 0px  !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none; 
+  }
+
+
+* {
+    font-family: -apple-system, system-ui, BlinkMacSystemFont !important;
+    /* letter-spacing: 0.1px !important; */
+}
+
+.ring-1,.shadow-tremor-card {
+    box-shadow: none !important;
+    border: 1px solid #e7e7e7 !important;
+}
+
+.rounded-tremor-default {
+    border-radius: .6rem !important;
+}
+
+.metric-identifier-span {
+    font-size: 70%;
+    display: inline-block;
+    padding-left: 3px;
+}
+
+.macos-buttons {
+	display: flex;
+    gap: 8px;
+    align-items: center;
+    /* margin-bottom: 20px; */
+    position: relative;
+    /* top: -5px; */
+    background: rgb(255 255 255 / 60%);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-bottom: 1px #e7e7e7 solid;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    height: 56px;
+}
+	
+	.macos-buttons_items {
+		height: 15px;
+		width: 15px;
+		border-radius: 10px;
+        -webkit-app-region: no-drag;
+	}
+
+    span.macos-buttons_items {
+
+        z-index: 9999999999;
+    }
+
+    
+
+    .macos-buttons_items:hover {
+        cursor: pointer;
+        opacity: .7
+    }
+	
+	.macos-buttons_items:nth-child(1) {
+		background-color: #fc605b;
+	}
+	
+	.macos-buttons_items:nth-child(2) {
+		background-color: #fcbb40;
+	}
+	
+	.macos-buttons_items:nth-child(3) {
+		background-color: #33c648;
+        filter: grayscale(1)
+	}
+
+    .macos-buttons_items:nth-child(3):hover {
+        cursor: default;
+        opacity: 1
+    }
+
+
+.serialnumber {
+    filter: blur(3px);
+    transition: .3s;
+}
+
+.serialnumber:hover {
+    filter: none;
+}
+
+body::-webkit-scrollbar{
+    display: none !important;
+    width: 0px  !important;
+    scrollbar-width: none;
+    -ms-overflow-style: none; 
+  }
+
+.toolbar-drag-button {
+    margin-left: auto;
+    padding: 7.5px;
+    transition: .3s;
+    -webkit-app-region: no-drag !important;
+    position: relative;
+    right: -7.5px;
+}
+
+.toolbar-drag-button:hover {
+    background: #eee;
+    cursor: pointer;
+    border-radius: 100%;
+    transform: rotateZ(95deg);
+}
+
+.cpu-cores-grid {
+    /* display: grid;
+    grid-template-columns: repeat(auto-fill, 10px);
+    grid-template-rows: auto; */
+
+    display: flex;
+
+    gap: 3px;
+    /* width: 200px; */
+}
+
+.cpu-cores-grid .core {
+    height: 20px;
+    width: 8px;
+    display: flex;
+    align-items: flex-end;
+    background: #eee;
+    /* border-radius: 2px; */
+}
+
+.cpu-cores-grid .core-fill {
+    height: 50%;
+    background: #3b82f6;
+    width: 100%;
+    /* border-radius: 2px; */
+    transition: .1s;
+}
+
+.widget-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: grayscale(1);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 9;
+    border-radius: .6rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: 1px dashed #bbb;
+}

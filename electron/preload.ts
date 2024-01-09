@@ -191,8 +191,8 @@ contextBridge.exposeInMainWorld(
       on: (event: string, func: any) => { 
           ipcRenderer.on(event, (_, v) => func(v));
       },
-      send: (event: string) => {
-        ipcRenderer.send(event)
+      send: (event: string, ...args: any[]) => {
+        ipcRenderer.send(event, ...args)
       },
       allUpdatesProcessed: () => removeLoading()
   }

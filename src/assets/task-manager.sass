@@ -1,0 +1,238 @@
+.task-manager__primary-card
+    height: calc(100vh - 87px)
+    padding-bottom: 0px
+    border-bottom-left-radius: 0px !important
+    border-bottom-right-radius: 0px !important
+    
+.task-manager__list::-webkit-scrollbar
+    display: none !important
+    width: 0px  !important
+    scrollbar-width: none
+    -ms-overflow-style: none
+
+.task-manager__header
+    display: grid !important
+    grid-template-columns: 32px 65px 1fr 70px 90px
+    gap: 10px
+    align-items: center
+    color: #28282c
+    font-size: 14px
+    position: absolute
+    width: 100%
+    left: 0px
+    height: 40px
+    // background: rgb(255 255 255 / 60%)
+    backdrop-filter: blur(10px)
+    top: 0px
+    font-weight: 500
+    z-index: 99
+    border-radius: .6rem .6rem 0 0 !important
+    border-bottom: 1px #e7e7e7 solid
+    padding: 0px 1.5rem 0px 1.5rem
+    // box-shadow: 0px 0px 20px 0px rgb(34 60 80 / 13%)
+    // background: rgba(236, 236, 236, 0.6)
+
+    .pid-sort-sm
+        display: none
+
+    @media (max-width: 700px)
+        grid-template-columns: 50px 1fr 60px 70px
+
+
+        .pid-sort-sm
+            display: block
+
+        .pid-sort-lg
+            display: none
+
+
+        .filters
+            display: none
+        
+        .pid
+            justify-content: flex-start !important
+
+    .clickable
+        cursor: pointer
+        transition: .3s
+
+        &:hover
+            opacity: .7
+
+
+    .name
+        display: flex
+        align-items: center
+
+    .pid
+        display: flex
+        justify-content: flex-end
+        align-items: center
+
+    .cpu
+        display: flex
+        justify-content: flex-end
+        align-items: center
+
+    .mem
+        display: flex
+        justify-content: flex-end
+        align-items: center
+
+    .filters
+        .dd-button
+            color: #3b82f6
+            cursor: pointer
+
+.task-manager__task
+    display: grid !important
+    grid-template-columns: 32px 65px 1fr 70px 90px
+    gap: 10px
+    align-items: center
+    color: #6f7684
+    font-size: 14px
+
+    @media (max-width: 700px)
+        grid-template-columns: 50px 1fr 60px 70px
+
+        .action-button
+            display: none
+
+        .icon-picture
+            display: none
+
+        .pid
+            text-align: left !important
+
+    .process-name-and-actions
+        display: flex
+        justify-content: space-between
+
+        .actions
+            display: flex
+
+            .action-button
+                margin-left: 5px
+                opacity: .5
+                
+
+        .action-button
+            transition: .3s
+            cursor: pointer
+            
+            &:hover
+                color: #222
+
+    .pid
+        text-align: right
+
+    .cpu
+        text-align: right
+
+    .mem
+        text-align: right
+    
+    .name
+        word-break: break-word
+        display: block
+        width-width: 100%
+        overflow: hidden
+        white-space: pre-wrap
+        height: 22px
+        // display: block
+        // width: 100%
+        // white-space: nowrap
+        // overflow: hidden
+        // text-overflow: ellipsis
+
+    // .process-name-and-actions
+    //     // background: red
+    //     display: block
+    //     width-width: 100%
+    //     overflow: hidden
+    //     white-space: pre-wrap
+    //     height: 22px
+
+.task-manager__list
+    position: relative
+    overflow: scroll
+    height: 100%
+    padding-top: 25px
+
+    .task-manager__task
+        margin-bottom: 5px
+        padding-bottom: 5px
+        border-bottom: 1px solid #eee
+
+        &:last-child
+            margin-bottom: none
+            border-bottom: none
+
+.task-manager__primary-filters-card
+    // padding: 10px !important
+    display: flex
+    justify-content: space-between
+    gap: 10px
+    padding: 0px !important
+    background: transparent !important
+    border: none !important
+
+.filter-button
+    display: block
+    position: relative
+
+    &:hover .dropdown-menu
+        transform: translate(0px, 0px)
+        opacity: 1
+        // animation: growDown 200ms forwards
+        // transform-origin: top center
+
+    .dropdown-menu
+        position: absolute
+        background: #fff
+        border: 1px solid #e8e8e8
+        border-radius: 12px
+        // border-top-left-radius: 0px
+        z-index: 999
+        width: 200px
+        left: 50px
+        top: -28px
+        box-shadow: 0px 9px 23px 10px rgb(0 0 0 / 5%)
+        opacity: 0
+        transform: translate(0px, -50px)
+        transition: .2s
+        font-weight: 400
+
+        &::after
+            content: ""
+            position: absolute
+            top: 50%
+            right: 100%
+            margin-left: -5px
+            border-width: 5px
+            border-style: solid
+            border-color:  transparent #fff transparent transparent
+        
+        .item
+            // margin-bottom: 5px
+            border-bottom: 1px solid #eeeeee
+            padding: 10px 15px
+
+
+            &:last-child
+                margin-bottom: 0px
+                border-bottom: none
+
+.blinking
+  animation: blink 2.5s infinite
+
+@keyframes blink
+  0%
+    opacity: 1
+
+  50%
+    opacity: 0.6
+
+  100%
+    opacity: 1
+

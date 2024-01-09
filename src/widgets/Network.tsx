@@ -30,7 +30,7 @@ export default (props: CardProps & React.RefAttributes<HTMLDivElement> & { updat
     </div>
 </div>}<Card >
     <Flex justifyContent="between" className="space-x-2">
-      <Title className="w-full">Network</Title>
+      <Title style={{width: '130px'}}>Network</Title>
 
       <Flex justifyContent="end" className="space-x-1 truncate">
         <Badge icon={ArrowDownIcon}>{humanFileSize(props?.updatesHeap?.network?.rx)}</Badge>

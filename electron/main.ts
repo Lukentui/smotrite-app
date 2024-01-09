@@ -1,7 +1,21 @@
-import { app, BrowserWindow, ipcMain, ipcRenderer } from 'electron'
+import { app, BrowserWindow, ipcMain, ipcRenderer, net, protocol, dialog } from 'electron'
 import path from 'node:path'
 import * as si from 'systeminformation';
+import { spawnSync } from 'child_process';
 require('@electron/remote/main').initialize()
+const { getAppIconByPid } = require('node-mac-app-icon');
+import fs from 'node:fs';
+const { exec } = require('node:child_process');
+import macMemory from 'mac-memory-ts'
+
+
+
+
+// Disable error dialogs by overriding
+dialog.showErrorBox = function(title, content) {
+    console.log(`${title}\n${content}`);
+};
+
 // The built directory structure
 //
 // ├─┬─┬ dist
@@ -20,8 +34,13 @@ let win: BrowserWindow | null
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
 const setIntervalImmideately = (func: () => void, ms: number) => {
-  func()
-  setInterval(func, ms)
+  try {
+
+    func()
+    setInterval(func, ms)
+  } catch(e) {
+    console.error('interval error: ' + String(e))
+  }
 }
 
 
@@ -29,7 +48,9 @@ function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
+      // nodeIntegration: true,
       preload: path.join(__dirname, 'preload.js'),
+      // contextIsolation: false
     },
     frame: false,
     width: 900,
@@ -38,7 +59,14 @@ function createWindow() {
     minHeight: 450,
     minWidth: 470,
     title: 'Smotrite',
+    // transparent: true,
+    // backgroundColor: "#00000000",
+    // vibrancy: 'light',
+    thickFrame: true,
+    // backgroundMaterial: 'mica'
   })
+
+  const psaux = require('psaux');
 
   let updates = {};
 const touchUpdate = (e: string) => {
@@ -49,12 +77,30 @@ const touchUpdate = (e: string) => {
   }
 }
 
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
   setIntervalImmideately(async () => {
-    win?.webContents.send('memoryUpdate', await si.mem());
+    win?.webContents.send('memoryUpdate', await macMemory());
     touchUpdate('memoryUpdate');
+
   }, 2500)
+
+  setIntervalImmideately(async() => {
+
+    exec('/Users/luka/Library/Developer/Xcode/DerivedData/GetAppIcon-edzzxpnjwlrnokffdjkgdokbpqyu/Build/Products/Debug/GetAppIcon', (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+      }
+      // console.log(`stdout: ${stdout}`);
+      // console.error(`stderr: ${stderr}`);
+
+    win?.webContents.send('processListUpdate', JSON.parse(stdout));
+    }); 
+
+    // let {error, stdout, stderr} = await exec();
+
+  }, 3500)
 
 
   setIntervalImmideately(async () => {
@@ -146,4 +192,48 @@ ipcMain.on('minimize', () => {
   BrowserWindow.getFocusedWindow()?.minimize();
 })
 
-app.whenReady().then(createWindow)
+ipcMain.on('kill-process', (_, { processId, appId }) => {
+  if(typeof processId !== 'number') {
+    return
+  }
+
+  exec(`kill -9 ${processId}`, (error, stdout, stderr) => {
+    if (error) {
+      setTimeout(() => {
+
+        win?.webContents.send('kill-process-error', {
+          processId, appId, error: stderr
+        });
+        console.info(error, stderr)
+      }, 1500)
+      return;
+    }
+
+
+  }); 
+
+  console.info(processId)
+})
+
+ipcMain.on('open-process-path', (_, { processId }) => {
+  if(typeof processId !== 'number') {
+    return
+  }
+
+  exec(`/usr/bin/open $(dirname $(ps -o comm= -p ${processId}))`, (error, stdout, stderr) => {
+    console.info(error)
+  }); 
+
+  console.info(processId)
+})
+
+ipcMain.on('settings-button', () => {
+  win.webContents.openDevTools();
+})
+
+
+app.whenReady().then(() => {
+  protocol.handle('local-fs', (request) => net.fetch('file://' + request.url.slice('local-fs://'.length)))
+
+  return createWindow()
+})

@@ -18,12 +18,88 @@ body {
     left: 0px; */
 }
 
+.last-right-side-buffer {
+    display: none;
+}
+
+
+@media (max-width: 639px) {
+    .first-right-side-buffer {
+        display: none;
+    }
+    .last-right-side-buffer {
+        display: block;
+    }
+    
+  }
+
+/* first-right-side-buffer */
+
 .global-frame-layout .frame-part {
     height: 56px;
     position: fixed;
     width: 100vw;
     z-index: 99999999999;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    height: 56px;
+    background: rgb(255 255 255 / 60%);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px #e7e7e7 solid;
+    align-items: center;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
 }
+
+.frame-part .screens-tabs {
+    -webkit-app-region: no-drag;
+}
+
+.frame-part .screens-tabs .screens-tabs__wrapper {
+    background: rgb(238,	238,	238	);
+    border-radius: 9px;
+    display: flex;
+    padding: 2px;
+    align-items: center;
+    /* margin-left: 60px; */
+    position: relative;
+}
+
+.frame-part .screens-tabs .screens-tabs__wrapper .tabs-item {
+    height: 25px;
+    width: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 16px;
+    font-size: 14px;
+    z-index: 2;
+    color: #211e1e;
+    transition: .3s;
+}
+
+.frame-part .screens-tabs .screens-tabs__wrapper .grey-space {
+    width: 120px;
+    height: 25px;
+    z-index: 1;
+    /* box-shadow: rgb(39 39 39 / 10%) 0px 0px 10px; */
+    background: #fff;
+    border-radius: 8px;
+    position: absolute;
+    transition: .3s;
+    transition-timing-function: ease;
+    border: 1px solid #dbdbdba6;
+}
+
+.frame-part .screens-tabs .screens-tabs__wrapper .item.active {
+    /* background: #fff; */
+    font-weight: 500;
+    /* color: #211e1e57; */
+}
+
 
 .global-frame-layout .app-part {
     height: 100vh;
@@ -66,26 +142,16 @@ body {
     /* margin-bottom: 20px; */
     position: relative;
     /* top: -5px; */
-    background: rgb(255 255 255 / 60%);
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-bottom: 1px #e7e7e7 solid;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
-    height: 56px;
+    -webkit-app-region: no-drag;
 }
 	
 	.macos-buttons_items {
 		height: 15px;
 		width: 15px;
 		border-radius: 10px;
-        -webkit-app-region: no-drag;
 	}
 
     span.macos-buttons_items {
-
         z-index: 9999999999;
     }
 
@@ -132,12 +198,13 @@ body::-webkit-scrollbar{
   }
 
 .toolbar-drag-button {
-    margin-left: auto;
+    -webkit-app-region: no-drag;
+    /* margin-left: auto; */
     padding: 7.5px;
     transition: .3s;
     -webkit-app-region: no-drag !important;
-    position: relative;
-    right: -7.5px;
+    /* position: relative; */
+    /* right: -7.5px; */
 }
 
 .toolbar-drag-button:hover {

@@ -1,5 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/solid"
 import { Badge, Card, CardProps,Text, Flex, List, ListItem, ProgressBar, Title } from "@tremor/react"
+import { FixedSizeList as ListWindow } from "react-window";
 
 function humanFileSize(bytes: any, si = true, dp = 1) {
     const thresh = si ? 1000 : 1024;
@@ -23,7 +24,10 @@ function humanFileSize(bytes: any, si = true, dp = 1) {
     return bytes.toFixed(dp) + '' + units[u];
   }
 
+
+
 export default (props: CardProps & React.RefAttributes<HTMLDivElement> & { updatesHeap: any; layoutUpdate: number; settings?: boolean }) => {
+
     return <div {...props} style={{ position: 'relative' }}>
       
       {props?.settings && <div className="widget-overlay">
@@ -32,19 +36,17 @@ export default (props: CardProps & React.RefAttributes<HTMLDivElement> & { updat
             </div>
         </div>}
         <Card >
-    <Flex justifyContent="between" className="space-x-2">
-      <Title className="w-full">Drives</Title>
-
-      {/* {JSON.stringify(props?.updatesHeap?.drivesIO)} */}
+    <Flex justifyContent="between">
+      <Title style={{ width: '100px' }}>Drives</Title>
 
       <Flex justifyContent="end" className="space-x-1 truncate">
         <Badge icon={ArrowDownIcon}>{humanFileSize(props?.updatesHeap?.drivesIO?.wx_sec)}</Badge>
         <Badge icon={ArrowUpIcon}>{humanFileSize(props?.updatesHeap?.drivesIO?.rx_sec)}</Badge>
       </Flex>
     </Flex>
-    
+
     <List className="mt-4">
-      {
+    {
         props?.updatesHeap?.drivesLayout?.map((v: any) => <ListItem >
           <Flex justifyContent="between" className="space-x-1 truncate">
             <Text>{v.name}</Text>
@@ -52,7 +54,21 @@ export default (props: CardProps & React.RefAttributes<HTMLDivElement> & { updat
           </Flex>
         </ListItem>)
       }
+
+  </List>
+
+    
+    {/* <List className="mt-4" style={{ maxHeight: 300 }}>
+
+          <ListWindow
+              className="List"
+              height={150}
+              itemCount={(props?.updatesHeap?.processList ?? []).length}
+              itemSize={35}
+            >
+              {Row}
+            </ListWindow>
               
-          </List>
+          </List> */}
   </Card></div>
 }

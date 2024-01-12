@@ -16,7 +16,7 @@ Drag and Drop             |  Fancy frame and mini view
 ![](https://i.imgur.com/FM0I4PG.gif)  |  ![](https://i.imgur.com/FSjQvO2.png)
 
 ## Disclaimer
-I made this app last weekend please, make note it currently in alpha and actually contains only design and few basic widgets with shitty code inside :) Also I will glad to accept any contributions.
+I made this app last weekend. Please note that it is currently in alpha and actually contains only design and a few basic widgets with poor code inside. Also, I will be glad to accept any contributions.
 
 ## Todo
 - Refactor

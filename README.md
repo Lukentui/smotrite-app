@@ -9,7 +9,7 @@
 ![Hardware](https://img.shields.io/static/v1.svg?label=%F0%9F%94%A9&message=Hardware%20&color=eee&labelColor=eee)
 ![Drives](https://img.shields.io/static/v1.svg?label=%F0%9F%92%BE&message=Drives%20&color=353535&labelColor=353535)
 ![Memory](https://img.shields.io/static/v1.svg?label=%F0%9F%92%A8&message=Memory%20&color=5b82af&labelColor=5b82af)
-![CPU Temperature](https://img.shields.io/static/v1.svg?label=%F0%9F%91%BE&message=CPU%20Temperature%20&color=b574c4&labelColor=b574c4)
+![CPU Temperature](https://img.shields.io/static/v1.svg?label=%F0%9F%8C%A1%EF%B8%8F&message=CPU%20Temperature%20&color=b574c4&labelColor=b574c4)
 
 
   

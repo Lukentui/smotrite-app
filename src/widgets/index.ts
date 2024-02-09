@@ -1,4 +1,5 @@
 import Cpu from "./Cpu";
+import CpuTemperature from "./CpuTemperature";
 import Drives from "./Drives";
 import Hardware from "./Hardware";
 import Memory from "./Memory";
@@ -10,4 +11,5 @@ export const WidgetsComponents = {
     'memory': Memory,
     'cpu': Cpu,
     'drives': Drives,
+    'cpuTemperature': CpuTemperature,
 }

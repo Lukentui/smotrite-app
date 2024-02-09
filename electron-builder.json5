@@ -13,8 +13,13 @@
   "copyright": "Luka Nikitin",
   "files": [
     "dist",
-    "dist-electron"
+    "dist-electron", "bin"
   ],
+  extraFiles: [{
+    "from": "bin",
+    "to": "bin",
+    "filter": ["**/*"]
+  }],
   "mac": {
     "target": [
       "dmg"

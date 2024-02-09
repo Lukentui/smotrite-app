@@ -37,7 +37,7 @@ export default (props: CardProps & React.RefAttributes<HTMLDivElement> & { updat
         </div>}
         <Card >
     <Flex justifyContent="between">
-      <Title style={{ width: '100px' }}>Drives</Title>
+      <Title style={{ width: '80px' }}>Drives</Title>
 
       <Flex justifyContent="end" className="space-x-1 truncate">
         <Badge icon={ArrowDownIcon}>{humanFileSize(props?.updatesHeap?.drivesIO?.wx_sec)}</Badge>

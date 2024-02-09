@@ -11,7 +11,7 @@ import React from 'react';
 import { WidgetsComponents } from './../widgets';
 
 const defaultLayout = {
-  'right': ['hardware', 'network'],
+  'right': ['hardware', 'network', 'cpuTemperature'],
   'left': ['memory', 'cpu', 'drives']
 }
 
@@ -46,6 +46,20 @@ export default () => {
       localStorage.setItem('dashboardUpdatesHeap', JSON.stringify(updatesHeap.current))
       setLayoutUpdate(+new Date())
     });
+
+    (window as any).api.on("cpuTemperatureUpdate", (data: any) => {
+      updatesHeap.current = ({
+        ...updatesHeap.current,
+        cpuTemperature: {
+          current: data.current
+        }
+      })
+
+      localStorage.setItem('dashboardUpdatesHeap', JSON.stringify(updatesHeap.current))
+      setLayoutUpdate(+new Date())
+    });
+
+    
 
     (window as any).api.on("cpuUpdate", (data: any) => {
       updatesHeap.current = ({

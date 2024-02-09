@@ -31,7 +31,7 @@ export default (
       updatesHeap: any;
       layoutUpdate: number;
       settings?: boolean;
-    }
+    },
 ) => {
   return (
     <div {...props} style={{ position: "relative" }}>

@@ -1,5 +1,12 @@
-import { Badge, Card, CardProps, Flex, Text, Metric, Title } from "@tremor/react";
-
+import {
+  Badge,
+  Card,
+  CardProps,
+  Flex,
+  Text,
+  Metric,
+  Title,
+} from "@tremor/react";
 
 export default (
   props: CardProps &
@@ -7,11 +14,11 @@ export default (
       updatesHeap: any;
       layoutUpdate: number;
       settings?: boolean;
-    }
+    },
 ) => {
   return (
     <div {...props} style={{ position: "relative" }}>
-<Card>
+      <Card>
         <Flex justifyContent="between" className="space-x-2">
           <Title style={{ width: "300px" }}>CPU Temperature</Title>
 

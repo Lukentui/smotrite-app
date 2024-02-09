@@ -1,6 +1,4 @@
-import {
-  Card,
-} from "@tremor/react";
+import { Card } from "@tremor/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./../App.css";
 import { Tooltip } from "react-tooltip";
@@ -149,7 +147,7 @@ export default () => {
   const [tasks, setTasks] = useState(
     localStorage.getItem("taskmanagerTasks")
       ? JSON.parse(localStorage.getItem("taskmanagerTasks"))
-      : []
+      : [],
   );
 
   const [liveUpdates, setLiveUpdates] = useState(true);
@@ -159,7 +157,7 @@ export default () => {
     direction: "asc" | "desc";
   }>({ column: "cpuPercent", direction: "asc" });
   const [alternativeTooltipContent, setAlternativeTooltipContent] = useState(
-    {}
+    {},
   );
 
   useEffect(() => {
@@ -190,7 +188,7 @@ export default () => {
         }
 
         return realA[sort.column] - realB[sort.column];
-      }
+      },
     );
 
     lastProcessedTasks.current = res;

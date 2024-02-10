@@ -1,6 +1,6 @@
 # Smotrite
 <img src="https://raw.githubusercontent.com/Lukentui/smotrite-app/main/etc/icons/256x256x32.png" width="100" height="100" align="right" />
-✨ System monitor for macOS, which just work.
+✨ Better Activity Monitor alternative for macOS.
 
 ### Widgets
 
@@ -16,7 +16,7 @@
 
 Drag and Drop             |  Fancy frame and mini view
 :-------------------------:|:-------------------------:
-![](https://i.imgur.com/FM0I4PG.gif)  |  ![](https://i.imgur.com/XgJf6CU.png)
+![](https://i.imgur.com/HvRNXaX.gif)  |  ![](https://i.imgur.com/XgJf6CU.png)
 
 ## Disclaimer
 I made this app last weekend. Please note that it is currently in alpha and actually contains only design and a few basic widgets with poor code inside. Also, I will be glad to accept any contributions.

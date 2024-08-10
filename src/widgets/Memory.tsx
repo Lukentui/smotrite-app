@@ -28,7 +28,7 @@ export default (
       )}
       <Card>
         <Flex alignItems="start">
-          <Text>Memory</Text>
+          <Text>Memory used</Text>
           <Badge>{props?.updatesHeap?.memory?.usedPercent}%</Badge>
         </Flex>
         <Flex

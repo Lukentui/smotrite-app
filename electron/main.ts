@@ -13,6 +13,7 @@ require("@electron/remote/main").initialize();
 const { exec } = require("node:child_process");
 import macMemory from "mac-memory-ts";
 import { initialize, trackEvent } from "@aptabase/electron/main";
+import {isAppleSilicon} from 'is-apple-silicon';
 
 initialize("A-EU-2276314363");
 
@@ -164,6 +165,8 @@ function createWindow() {
       cpu: (await si.cpu()).manufacturer + " " + (await si.cpu()).brand,
       gpu: (await si.graphics())?.controllers[0]?.model ?? "unknown",
       memoryBanks: (await si.memLayout()).map((v) => v.size / 1073741824),
+      isAppleSilicon: isAppleSilicon(true),
+      serialNumber: (await si.system()).serial,
 
       disks: await si.diskLayout(),
       totalSpace:

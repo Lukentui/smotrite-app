@@ -1,4 +1,5 @@
 import { Card, CardProps, List, ListItem, Switch, Title } from "@tremor/react";
+import { useMemo } from "react";
 
 export default (
   props: CardProps &
@@ -12,6 +13,24 @@ export default (
     (prev: any, curr: any) => prev + curr,
     0,
   );
+
+  const memoryView = useMemo(() => {
+    const size = `${totalMemoryGb}GB`;
+    const banks =
+      props?.updatesHeap?.hardware?.memoryBanks?.length &&
+      props?.updatesHeap?.hardware?.memoryBanks?.length > 1 ?
+        props?.updatesHeap?.hardware?.memoryBanks
+        ?.map((v: any) => `${v}GB`)
+        .join(" + ")
+      : null;
+
+      if(banks) {
+        return <>{banks} = {size}</>
+      }
+
+      return size;
+  }, [props?.updatesHeap])
+
 
   return (
     <div {...props} style={{ position: "relative" }}>
@@ -30,29 +49,37 @@ export default (
             <span>{props?.updatesHeap?.hardware?.os}</span>
           </ListItem>
 
-          <ListItem>
-            <span>CPU</span>
-            <span>{props?.updatesHeap?.hardware?.cpu}</span>
-          </ListItem>
+          {
+            props?.updatesHeap?.hardware?.isAppleSilicon
+            ?
+              <ListItem>
+                <span>SoC</span>
+                <span>{props?.updatesHeap?.hardware?.cpu}</span>
+              </ListItem>
+            :
+              <>
+                <ListItem>
+                  <span>CPU</span>
+                  <span>{props?.updatesHeap?.hardware?.cpu}</span>
+                </ListItem>
 
-          <ListItem>
-            <span>GPU</span>
-            <span>{props?.updatesHeap?.hardware?.gpu}</span>
-          </ListItem>
+                <ListItem>
+                  <span>GPU</span>
+                  <span>{props?.updatesHeap?.hardware?.gpu}</span>
+                </ListItem>
+              </>
+          }
 
           <ListItem>
             <span>Memory</span>
             <span>
-              {props?.updatesHeap?.hardware?.memoryBanks
-                ?.map((v: any) => `${v}GB`)
-                .join(" + ")}{" "}
-              = {totalMemoryGb}GB
+              {memoryView}
             </span>
           </ListItem>
 
           <ListItem>
             <span>Serial</span>
-            <span className="serialnumber">C12D90F3PN1A</span>
+            <span className="serialnumber">{props?.updatesHeap?.hardware?.serialNumber}</span>
           </ListItem>
         </List>
       </Card>

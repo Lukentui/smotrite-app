@@ -25,3 +25,5 @@ I made this app last weekend. Please note that it is currently in alpha and actu
 - Refactor
 - i18n
 
+## License
+For commercial use, contact Luka Nikitin(x0333@pm.me) for licensing terms.

@@ -89,7 +89,7 @@ function createWindow() {
 
   setIntervalImmideately(async () => {
     exec(
-      process.execPath.replace("MacOS/Smotrite", "") + "bin/" + "process-list",
+      app.getAppPath() + "/bin/process-list",
       (error, stdout, stderr) => {
         if (error) {
           console.error(`exec error: ${error}`);
@@ -108,7 +108,7 @@ function createWindow() {
   setIntervalImmideately(async () => {
     console.info(__dirname);
     exec(
-      process.execPath.replace("MacOS/Smotrite", "") + "bin/" + "cpu-temp",
+      app.getAppPath() + "/bin/cpu-temp",
       (error, stdout, stderr) => {
         if (error) {
           console.error(`exec error: ${error}`);

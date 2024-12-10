@@ -18,19 +18,22 @@ export default (
     const size = `${totalMemoryGb}GB`;
     const banks =
       props?.updatesHeap?.hardware?.memoryBanks?.length &&
-      props?.updatesHeap?.hardware?.memoryBanks?.length > 1 ?
-        props?.updatesHeap?.hardware?.memoryBanks
-        ?.map((v: any) => `${v}GB`)
-        .join(" + ")
-      : null;
+      props?.updatesHeap?.hardware?.memoryBanks?.length > 1
+        ? props?.updatesHeap?.hardware?.memoryBanks
+            ?.map((v: any) => `${v}GB`)
+            .join(" + ")
+        : null;
 
-      if(banks) {
-        return <>{banks} = {size}</>
-      }
+    if (banks) {
+      return (
+        <>
+          {banks} = {size}
+        </>
+      );
+    }
 
-      return size;
-  }, [props?.updatesHeap])
-
+    return size;
+  }, [props?.updatesHeap]);
 
   return (
     <div {...props} style={{ position: "relative" }}>
@@ -49,37 +52,35 @@ export default (
             <span>{props?.updatesHeap?.hardware?.os}</span>
           </ListItem>
 
-          {
-            props?.updatesHeap?.hardware?.isAppleSilicon
-            ?
-              <ListItem>
-                <span>SoC</span>
+          {props?.updatesHeap?.hardware?.isAppleSilicon ? (
+            <ListItem data-testid="soc">
+              <span>SoC</span>
+              <span>{props?.updatesHeap?.hardware?.cpu}</span>
+            </ListItem>
+          ) : (
+            <>
+              <ListItem data-testid="cpu">
+                <span>CPU</span>
                 <span>{props?.updatesHeap?.hardware?.cpu}</span>
               </ListItem>
-            :
-              <>
-                <ListItem>
-                  <span>CPU</span>
-                  <span>{props?.updatesHeap?.hardware?.cpu}</span>
-                </ListItem>
 
-                <ListItem>
-                  <span>GPU</span>
-                  <span>{props?.updatesHeap?.hardware?.gpu}</span>
-                </ListItem>
-              </>
-          }
+              <ListItem data-testid="gpu">
+                <span>GPU</span>
+                <span>{props?.updatesHeap?.hardware?.gpu}</span>
+              </ListItem>
+            </>
+          )}
 
           <ListItem>
             <span>Memory</span>
-            <span>
-              {memoryView}
-            </span>
+            <span>{memoryView}</span>
           </ListItem>
 
           <ListItem>
             <span>Serial</span>
-            <span className="serialnumber">{props?.updatesHeap?.hardware?.serialNumber}</span>
+            <span className="serialnumber">
+              {props?.updatesHeap?.hardware?.serialNumber}
+            </span>
           </ListItem>
         </List>
       </Card>

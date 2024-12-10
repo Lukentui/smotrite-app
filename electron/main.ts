@@ -2,48 +2,31 @@ import {
   app,
   BrowserWindow,
   ipcMain,
-  ipcRenderer,
   net,
   protocol,
   dialog,
 } from "electron";
 import path from "node:path";
-import * as si from "systeminformation";
 require("@electron/remote/main").initialize();
 const { exec } = require("node:child_process");
-import macMemory from "mac-memory-ts";
 import { initialize, trackEvent } from "@aptabase/electron/main";
-import {isAppleSilicon} from 'is-apple-silicon';
-const https = require('https');
-const fs = require('fs');
-const extract = require('extract-zip')
-import dayjs from 'dayjs'
-import collectors from './collectors';
+import fs from 'fs';
+const extract = require("extract-zip");
+import dayjs from "dayjs";
+import collectors from "./collectors";
+import log from "electron-log";
+import Downloader from "nodejs-file-downloader";
+import { calculateSHA256ByPath, getAppDir } from "./fsManager";
+import axios from "axios";
+import { execute } from "async-execute";
+import { getSafeAppVersion } from "./electronHelpers";
 
-const appDir = app.getPath('appData') + '/pro.nikkitin.smotrite';
 initialize("A-EU-2276314363");
 
 // Disable error dialogs by overriding
 dialog.showErrorBox = function (title, content) {
   console.log(`${title}\n${content}`);
 };
-
-// 
-
-// fs.mkdirSync(appDir, { recursive: true });
-
-// const file = fs.createWriteStream(appDir + '/binaries.zip');
-// const request = https.get('https://objects.githubusercontent.com/github-production-release-asset-2e65be/715295812/0e992032-c33f-4d61-a07a-a2065ad621fa?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20240813%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240813T233400Z&X-Amz-Expires=300&X-Amz-Signature=1d6a6e8081101b826236ac4431a68f55d9dcfa369c09b61e4b4c5df7296d079e&X-Amz-SignedHeaders=host&actor_id=17615743&key_id=0&repo_id=715295812&response-content-disposition=attachment%3B%20filename%3Dbinaries.zip&response-content-type=application%2Foctet-stream', function(response) {
-//    response.pipe(file);
-
-//    // after download completed close filestream
-//    file.on("finish", () => {
-//        file.close();
-//        extract(appDir + '/binaries.zip', { dir: appDir })
-//        console.log("Download Completed");
-//    });
-// });
-
 
 process.env.DIST = path.join(__dirname, "../dist");
 process.env.VITE_PUBLIC = app.isPackaged
@@ -54,16 +37,18 @@ let win: BrowserWindow | null;
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 
-const metricsUpdatesLoop = async (callback?: (i: number, outOf: number) => void) => {
+const metricsUpdatesLoop = async (
+  callback?: (i: number, outOf: number) => void,
+) => {
   const currentUnixTimestamp = dayjs().unix();
 
   let i = 0;
   for (const collector of collectors) {
     i++;
-    console.info(`[${collector.name}]: ${i}`)
-    if(!collector.shouldBeExecuted(currentUnixTimestamp)) {
-      if(callback) {
-        callback.call(this, i, collectors.length)
+    // console.info(`[${collector.name}]: ${i}`);
+    if (!collector.executionCondition(currentUnixTimestamp)) {
+      if (callback) {
+        callback.call(this, i, collectors.length);
       }
       continue;
     }
@@ -71,19 +56,18 @@ const metricsUpdatesLoop = async (callback?: (i: number, outOf: number) => void)
     const res = await collector.collect(app);
 
     win?.webContents.send(collector.updatesHeapId, res);
-    console.info(`[NEW] ${collector.name}: ${JSON.stringify(res).substring(0, 50)}`)
+    // console.info(
+    //   `[NEW] ${collector.name}: ${JSON.stringify(res).substring(0, 50)}`,
+    // );
 
-    if(callback) {
-      callback.call(this, i, collectors.length)
+    if (callback) {
+      callback.call(this, i, collectors.length);
     }
   }
 
-  await new Promise(r => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 1000));
   metricsUpdatesLoop();
-}
-
-metricsUpdatesLoop()
-
+};
 
 const setIntervalImmideately = (func: () => void, ms: number) => {
   try {
@@ -95,7 +79,6 @@ const setIntervalImmideately = (func: () => void, ms: number) => {
 };
 
 function createWindow() {
-  console.warn(4, app.getVersion());
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
@@ -106,7 +89,7 @@ function createWindow() {
     frame: false,
     width: 900,
     maxWidth: 900,
-    height: 600,
+    height: 620,
     minHeight: 450,
     minWidth: 470,
     title: "Smotrite",
@@ -114,151 +97,97 @@ function createWindow() {
     // backgroundColor: "#00000000",
     // vibrancy: 'light',
     thickFrame: true,
-    
+
     // backgroundMaterial: 'mica'
   });
 
-  // let updates = {};
-  const touchUpdate = (e: string) => {
-    // updates[e] = 1;
-
-    // win?.webContents.send("setLoadingMessage", "Downloading binaries...")
-
-
-    // win?.webContents.send("setLoadingMessage", `Collecting metrics ${Object.keys(updates).length}/7`)
-
-    // if (Object.keys(updates).length >= 6) {
-    //   setTimeout(() => win?.webContents.send("removeLoading"), 500);
-    // }
-  };
-
-  // win.webContents.openDevTools();
-
-  // setIntervalImmideately(async () => {
-  //   if(!win.isFocused) return;
-
-  //   win?.webContents.send("memoryUpdate", await macMemory());
-  //   touchUpdate("memoryUpdate");
-  // }, 2500);
-
-  setIntervalImmideately(async () => {
-    if(!win.isFocused) return;
-    
-    exec(
-      process.execPath.replace("MacOS/Smotrite", "") + "bin/" + "process-list",
-      (error, stdout, stderr) => {
-        if (error) {
-          return;
-        }
-        // console.log(`stdout: ${stdout}`);
-        // console.error(`stderr: ${stderr}`);
-
-        win?.webContents.send("processListUpdate", JSON.parse(stdout));
+  win.webContents.once('dom-ready', async () => {
+      if(fs.existsSync(getAppDir() + '/.binaries_ok_' + getSafeAppVersion())) {
+        win?.webContents.send("setLoadingMessage", `A little more...`)
+        metricsUpdatesLoop();
+        setTimeout(() => win?.webContents.send("removeLoading"), 500);
+        return;
       }
-    );
 
-    // let {error, stdout, stderr} = await exec();
-  }, 3500);
+      // clean cache folder
+      fs.readdirSync(getAppDir()).forEach(f => fs.rmSync(`${getAppDir()}/${f}`));
+      
+      try {
+        const releaseInfo = await axios.get(`https://api.github.com/repos/Lukentui/smotrite-app/releases/tags/${app.isPackaged ? app.getVersion() : 'alpha'}`);
+        
 
-  // setIntervalImmideately(async () => {
-  //   if(!win.isFocused) return;
+        if(!releaseInfo.data?.assets?.some(asset => asset.name === 'binaries.zip.sha256-checksum')) {
+          throw new Error('Release does not include required file: binaries.zip.sha256-checksum')
+        }
+
+        if(!releaseInfo.data?.assets?.some(asset => asset.name === 'binaries.zip')) {
+          throw new Error('Release does not include required file: binaries.zip')
+        }
+      } catch(e) {
+        dialog.showMessageBox(win, {
+          type: 'error',
+          buttons: ['OK'],
+          title: 'Unable to download required binaries!',
+          message: `Unable to download required binaries! Version: ${app.isPackaged ? app.getVersion() : 'alpha'}. Error: ${String(e)}`,
+      });
+        win?.webContents.send("setLoadingMessage", `Unable to download required binaries!`)
+        return;
+      }
+
+      const downloader = new Downloader({
+        url: `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : 'alpha'}/binaries.zip`,
+        // url: "https://github.com/Lukentui/smotrite-app/releases/download/alpha/binaries.zip",
+        directory: getAppDir(),
+        fileName: 'binaries.zip',
+        onProgress: function (percentage) {
+          log.info(`Loading binaries: ${percentage}%`);
+          win?.webContents.send("setLoadingMessage", `Loading binaries: ${percentage}%`)
+        },
+      });
     
-  //   exec(
-  //     process.execPath.replace("MacOS/Smotrite", "") + "bin/" + "cpu-temp -c",
-  //     (error, stdout, stderr) => {
-  //       if (error) {
-  //         return;
-  //       }
-  //       // console.log(`stdout: ${stdout}`);
-  //       // console.error(`stderr: ${stderr}`);
+      try {
+        log.info('downloading binaries...');
+        await downloader.download();
+        log.info('downloaded!');
 
-  //       win?.webContents.send("cpuTemperatureUpdate", { current: stdout + ' °C' });
-  //     }
-  //   );
+        win?.webContents.send("setLoadingMessage", `Validating checksums...`)
+        const downloadedChecksum = await calculateSHA256ByPath(getAppDir() + "/binaries.zip");
+                                                  // `https://github.com/Lukentui/smotrite-app/releases/download/${app.getVersion()}/binaries.zip.sha256-checksum`,
+        const expectedChecksum = (await axios.get(
+          // 'https://github.com/Lukentui/smotrite-app/releases/download/alpha/binaries.zip.sha256-checksum'
+          `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : 'alpha'}/binaries.zip.sha256-checksum`
+        )).data.trim()
+        
+        log.log(`checksums: ${downloadedChecksum.substring(0, 6)}:${expectedChecksum.substring(0, 6)}`)
+        if(downloadedChecksum !== expectedChecksum) {
+          throw new Error(`Bad binaries checksum: ${downloadedChecksum}`)
+        }
 
-  //   // let {error, stdout, stderr} = await exec();
-  // }, 3500);
+        win?.webContents.send("setLoadingMessage", `Extracting binaries...`)
+        extract(getAppDir() + '/binaries.zip', { dir: getAppDir() })
+        win?.webContents.send("setLoadingMessage", `A little more...`)
+        metricsUpdatesLoop();
+        setTimeout(() => win?.webContents.send("removeLoading"), 1000);
+        fs.writeFileSync(getAppDir() + '/.binaries_ok_' + getSafeAppVersion(), '');
+      } catch (error) {
+        // todo show error on loading screen
+        log.error('Unable to initialize binaries: ' + error);
+      }
+  });
 
-  // setIntervalImmideately(async () => {
-  //   if(!win.isFocused) return;
-    
-  //   exec(
-  //     process.execPath.replace("MacOS/Smotrite", "") + "bin/" + "swap-usage",
-  //     (error, stdout, stderr) => {
-  //       if (error) {
-  //         win?.webContents.send("swapUpdate", { current: error });
-  //         touchUpdate("swapUpdate");
-  //         return;
-  //       }
-  //       // console.error(`stderr: ${stderr}`);
-
-  //       win?.webContents.send("swapUpdate", { current: Number(stdout ?? 0) });
-  //       touchUpdate("swapUpdate");
-  //     }
-  //   );
-
-  // }, 3500);
-
-  // setIntervalImmideately(async () => {
-  //   if(!win.isFocused) return;
-    
-  //   win?.webContents.send("drivesLayoutUpdate", await si.diskLayout());
-  //   touchUpdate("drivesLayoutUpdate");
-  // }, 5000);
+  if(!app.isPackaged) {
+    win.webContents.openDevTools();
+  }
 
   setIntervalImmideately(async () => {
-    if(!win.isFocused) return;
-    
-    // win?.webContents.send("drivesIOUpdate", await si.fsStats());
-    // touchUpdate("drivesIOUpdate");
+    if (!win.isFocused) return;
 
-    // win?.webContents.send("cpuUpdate", {
-    //   load: await si.currentLoad(),
-    //   cpu: await si.cpu(),
-
-    //   ...(await si.currentLoad()).cpus.reduce((prev, curr, i) => {
-    //     return {
-    //       ...prev,
-    //       [`core${i}`]: curr.load.toFixed(2),
-    //     };
-    //   }, {}),
-    // });
-    // touchUpdate("cpuUpdate");
-
-
-    // const network = await si.networkStats();
-    // if (!network.length) return;
-    // win?.webContents.send("networkUpdate", {
-    //   rx: network[0].rx_sec,
-    //   tx: network[0].tx_sec,
-    // });
-    // touchUpdate("networkUpdate");
-  }, 2000);
-
-  // setIntervalImmideately(async () => {
-  //   if(!win.isFocused) return;
-    
-  //   win?.webContents.send("hwInfoUpdate", {
-  //     os: (await si.osInfo()).codename + " " + (await si.osInfo()).release,
-  //     cpu: (await si.cpu()).manufacturer + " " + (await si.cpu()).brand,
-  //     gpu: (await si.graphics())?.controllers[0]?.model ?? "unknown",
-  //     memoryBanks: (await si.memLayout()).map((v) => v.size / 1073741824),
-  //     isAppleSilicon: isAppleSilicon(true),
-  //     serialNumber: (await si.system()).serial,
-
-  //     disks: await si.diskLayout(),
-  //     totalSpace:
-  //       (await si.diskLayout())
-  //         .map((v) => v.size)
-  //         .reduce((prev, curr) => prev + curr, 0) / 1073741824,
-  //   });
-  //   touchUpdate("hwInfoUpdate");
-  // }, 100000);
-
-  // Test active push message to Renderer-process.
-  win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
-  });
+    try {
+      // todo refactor
+      const result = await execute(`"${getAppDir()}/process-list"`);
+      win?.webContents.send("processListUpdate", JSON.parse(result));
+    } catch {}
+  }, 3500);
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
@@ -296,26 +225,25 @@ ipcMain.on("minimize", () => {
   trackEvent("app.minimize");
 });
 
-ipcMain.on("kill-process", (_, { processId, appId }) => {
+ipcMain.on("kill-process", async (_, { processId, appId }) => {
   if (typeof processId !== "number") {
     return;
   }
 
-  exec(`kill -9 ${processId}`, (error, stdout, stderr) => {
-    if (error) {
-      setTimeout(() => {
-        win?.webContents.send("kill-process-error", {
-          processId,
-          appId,
-          error: stderr,
-        });
-        console.info(error, stderr);
-      }, 1500);
-      return;
-    }
-  });
-
-  trackEvent("feature.process-kill");
+  try {
+    await execute(`kill -9 ${processId}`);
+    trackEvent("feature.process-kill.success");
+  } catch(e) {
+    trackEvent("feature.process-kill.error", {
+      reason: String(e)
+    });
+    
+    win?.webContents.send("kill-process-error", {
+      processId,
+      appId,
+      error: String(e),
+    });
+  }
 });
 
 ipcMain.on("open-process-path", (_, { processId }) => {
@@ -327,7 +255,7 @@ ipcMain.on("open-process-path", (_, { processId }) => {
     `/usr/bin/open $(dirname $(ps -o comm= -p ${processId}))`,
     (error, stdout, stderr) => {
       console.info(error);
-    }
+    },
   );
 
   trackEvent("feature.process-path");
@@ -340,7 +268,7 @@ ipcMain.on("settings-button", () => {
 
 app.whenReady().then(() => {
   protocol.handle("local-fs", (request) =>
-    net.fetch("file://" + request.url.slice("local-fs://".length))
+    net.fetch("file://" + request.url.slice("local-fs://".length)),
   );
   trackEvent("app.started");
   return createWindow();

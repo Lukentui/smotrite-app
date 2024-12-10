@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import "./../App.css";
 import { Grid } from "@tremor/react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+// import logger from 'electron-timber';
 
 import moment from "moment";
 import React from "react";
@@ -49,6 +50,7 @@ export default () => {
     });
 
     (window as any).api.on("cpuTemperatureUpdate", (data: any) => {
+      console.warn(5555, data)
       updatesHeap.current = {
         ...updatesHeap.current,
         cpuTemperature: {
@@ -164,8 +166,6 @@ export default () => {
       );
       setLayoutUpdate(+new Date());
     });
-
-    console.warn("setup");
   }, [a]);
 
   const reorder = (

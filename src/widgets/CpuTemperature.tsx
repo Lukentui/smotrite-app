@@ -16,6 +16,7 @@ export default (
       loading?: boolean;
     },
 ) => {
+  console.info(91, props?.updatesHeap?.cpuTemperature)
   return (
     <div {...props} style={{ position: "relative" }}>
       <Card>

@@ -1,10 +1,12 @@
-import { exec } from "child_process";
 import { App } from "electron";
 import macMemory from "mac-memory-ts";
 
 export default {
   updatesHeapId: "memoryUsage",
   name: "Memory usage",
-  shouldBeExecuted: (timestamp: number) => timestamp % 2 === 0,
-  collect: async (app: App): Promise<Object> => macMemory(),
+  executionCondition: (timestamp: number) => timestamp % 2 === 0,
+  collect: async (_: App): Promise<Record<string, any> & { successful: boolean }> => ({
+    successful: true,
+    ...await macMemory(),
+  }),
 };

@@ -5,8 +5,10 @@ import * as si from "systeminformation";
 export default {
   updatesHeapId: "cpuUpdate",
   name: "CPU Usage",
-  shouldBeExecuted: (timestamp: number) => timestamp % 2 === 0,
-  collect: async (app: App): Promise<Object> => ({
+  executionCondition: (timestamp: number) => timestamp % 2 === 0,
+  collect: async (app: number): Promise<Record<string, any> & { successful: boolean }> => ({
+    successful: true,
+    
     load: await si.currentLoad(),
     cpu: await si.cpu(),
 

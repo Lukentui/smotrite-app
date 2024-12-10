@@ -7,6 +7,7 @@ import { VList } from "virtua";
 import { Grid } from "@tremor/react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "../assets/task-manager.sass";
+import { humanFileSize } from "../helpers";
 
 const iconPlaceHolder =
   "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP89B8AAukB8/71MdcAAAAASUVORK5CYII=";
@@ -84,32 +85,9 @@ const openIcon = (
   </svg>
 );
 
-function humanFileSize(bytes: any, si = true, dp = 2) {
-  const thresh = si ? 1000 : 1024;
-
-  if (Math.abs(bytes) < thresh) {
-    return "0kB";
-  }
-
-  const units = si
-    ? ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-    : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-  let u = -1;
-  const r = 10 ** dp;
-
-  do {
-    bytes /= thresh;
-    ++u;
-  } while (
-    Math.round(Math.abs(bytes) * r) / r >= thresh &&
-    u < units.length - 1
-  );
-
-  return bytes.toFixed(dp) + "" + units[u];
-}
-
 const viseVersaDirection = (direction: "asc" | "desc") =>
   direction === "asc" ? "desc" : "asc";
+
 export default () => {
   const [a] = useState(1);
   const [tasks, setTasks] = useState(
@@ -136,7 +114,6 @@ export default () => {
     });
 
     (window as any).api.on("kill-process-error", (data: any) => {
-      console.info(data);
       setAlternativeTooltipContent({
         ...alternativeTooltipContent,
         [data.appId]: data.error,

@@ -7,12 +7,12 @@ import networkIO from "./networkIO";
 import swapUsage from "./swapUsage";
 
 export default [
-    swapUsage,
-    cpuUsage,
-    cpuTemperature,
-    memoryUsage,
-    drivesIO,
-    drivesLayout,
-    memoryUsage,
-    networkIO,
-]
+  swapUsage,
+  cpuUsage,
+  cpuTemperature,
+  memoryUsage,
+  drivesIO,
+  drivesLayout,
+  memoryUsage,
+  networkIO,
+];

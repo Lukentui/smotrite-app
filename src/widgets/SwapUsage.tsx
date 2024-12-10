@@ -19,17 +19,17 @@ export default (
 ) => {
   const result = useMemo(() => {
     const v = props?.updatesHeap?.swapUpdate?.current;
-    
-    if(Number.isInteger(v) && v > 1100) {
-      return (v / 1024).toFixed(2) + 'GB'
+
+    if (Number.isInteger(v) && v > 1100) {
+      return (v / 1024).toFixed(2) + "GB";
     }
 
-    if(Number.isInteger(v)) {
-      return v + 'MB'
+    if (Number.isInteger(v)) {
+      return v + "MB";
     }
 
-    return '?'
-  }, props?.updatesHeap?.swapUpdate?.current)
+    return "?";
+  }, props?.updatesHeap?.swapUpdate?.current);
   return (
     <div {...props} style={{ position: "relative" }}>
       <Card>
@@ -37,8 +37,7 @@ export default (
           <Title style={{ width: "300px" }}>Swap usage</Title>
 
           <Flex justifyContent="end" className="space-x-1 truncate">
-            <Badge color={result === '?' ? 'amber' : 'blue'}>{result}</Badge>
-            {/* {JSON.stringify(props.updatesHeap)} */}
+            <Badge color={result === "?" ? "amber" : "blue"}>{result}</Badge>
           </Flex>
         </Flex>
       </Card>

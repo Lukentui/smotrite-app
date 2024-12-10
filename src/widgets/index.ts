@@ -4,6 +4,7 @@ import Drives from "./Drives";
 import Hardware from "./Hardware";
 import Memory from "./Memory";
 import Network from "./Network";
+import SwapUsage from "./SwapUsage";
 
 export const WidgetsComponents = {
   hardware: Hardware,
@@ -12,4 +13,5 @@ export const WidgetsComponents = {
   cpu: Cpu,
   drives: Drives,
   cpuTemperature: CpuTemperature,
+  swapUsage: SwapUsage,
 };

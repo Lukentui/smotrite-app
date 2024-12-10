@@ -13,7 +13,7 @@ export default (
     React.RefAttributes<HTMLDivElement> & {
       updatesHeap: any;
       layoutUpdate: number;
-      settings?: boolean;
+      loading?: boolean;
     },
 ) => {
   return (

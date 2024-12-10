@@ -152,24 +152,31 @@ function useLoading() {
   oStyle.innerHTML = styleContent
   oDiv.className = 'app-loading-wrap'
   oDiv.innerHTML = `<div class="app-loading-wrap">
-
-  <div class="spinner center">
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
-    <div class="spinner-blade"></div>
+  <div>
+    <div class="spinner center">
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+      <div class="spinner-blade"></div>
+    </div>
+    <div style="margin-top: 100px" id="loading-msg-0">Downloading binaries...</div>
   </div>
+  
 </div>`
 
   return {
+    setMessageLoading(msg) {
+      console.warn(95945932, msg)
+      document.getElementById('loading-msg-0').textContent = msg;
+    },
     appendLoading() {
       safeDOM.append(document.head, oStyle)
       safeDOM.append(document.body, oDiv)
@@ -183,7 +190,7 @@ function useLoading() {
 
 // ----------------------------------------------------------------------
 
-const { appendLoading, removeLoading } = useLoading()
+const { appendLoading, removeLoading, setMessageLoading } = useLoading()
 domReady().then(appendLoading)
 
 contextBridge.exposeInMainWorld(
@@ -199,6 +206,8 @@ contextBridge.exposeInMainWorld(
 );
 
 ipcRenderer.on('removeLoading', () => removeLoading())
+ipcRenderer.on('setLoadingMessage', (_, v) => setMessageLoading(v))
+
 
 // window.onmessage = ev => {
   // console.info(ev.data)

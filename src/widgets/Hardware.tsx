@@ -6,7 +6,7 @@ export default (
     React.RefAttributes<HTMLDivElement> & {
       updatesHeap: any;
       layoutUpdate: number;
-      settings?: boolean;
+      loading?: boolean;
     },
 ) => {
   const totalMemoryGb = props?.updatesHeap?.hardware?.memoryBanks?.reduce(
@@ -34,7 +34,7 @@ export default (
 
   return (
     <div {...props} style={{ position: "relative" }}>
-      {props?.settings && (
+      {props?.loading && (
         <div className="widget-overlay">
           <div className="widget-overlay__buttons">Drag me</div>
         </div>

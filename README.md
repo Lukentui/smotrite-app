@@ -27,3 +27,7 @@ I made this app last weekend. Please note that it is currently in alpha and actu
 
 ## License
 For commercial use, contact Luka Nikitin(x0333@pm.me) for licensing terms.
+
+## Credits
+https://github.com/narugit/smctemp
+

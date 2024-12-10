@@ -238,7 +238,7 @@ body::-webkit-scrollbar {
 
 .widget-overlay {
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: grayscale(1);
+  backdrop-filter: grayscale(1) blur(10px);
   height: 100%;
   width: 100%;
   position: absolute;
@@ -248,5 +248,5 @@ body::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   color: #fff;
-  border: 1px dashed #bbb;
+
 }

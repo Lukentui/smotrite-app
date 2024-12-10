@@ -10,7 +10,7 @@ import { WidgetsComponents } from "./../widgets";
 
 const defaultLayout = {
   right: ["hardware", "network", "cpuTemperature"],
-  left: ["memory", "cpu", "drives"],
+  left: ["memory", "cpu", "drives", "swapUsage"],
 };
 
 export default () => {
@@ -151,6 +151,20 @@ export default () => {
       setLayoutUpdate(+new Date());
     });
 
+    (window as any).api.on("swapUpdate", (data: any) => {
+      // console.info(data)
+      updatesHeap.current = {
+        ...updatesHeap.current,
+        swapUpdate: data,
+      };
+
+      localStorage.setItem(
+        "dashboardUpdatesHeap",
+        JSON.stringify(updatesHeap.current),
+      );
+      setLayoutUpdate(+new Date());
+    });
+
     console.warn("setup");
   }, [a]);
 
@@ -261,6 +275,7 @@ export default () => {
                           {
                             updatesHeap: updatesHeap.current,
                             layoutUpdate: layoutUpdate,
+                            // loading: true,
                             // settings: true,
                           },
                         )}

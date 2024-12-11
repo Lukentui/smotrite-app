@@ -9,9 +9,9 @@ const killProcess = async (processId: number): Promise<void> => {
     }
 };
 
-const getProcessDirectory = async (processId: number): Promise<void> => {
+const getProcessDirectory = async (processId: number): Promise<string> => {
     try {
-        await execute(`/bin/sh -c "dirname $(ps -o comm= -p ${processId})"`);
+        return execute(`/bin/sh -c "dirname $(ps -o comm= -p ${processId})"`);
     } catch (e) {
         throw new Error(
             `Unable to find directory of the process ${processId}, reason: ${e}`,

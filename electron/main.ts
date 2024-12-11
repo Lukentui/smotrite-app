@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain, net, protocol, dialog } from "electron";
 import path from "node:path";
 require("@electron/remote/main").initialize();
-const { exec } = require("node:child_process");
 import { initialize, trackEvent } from "@aptabase/electron/main";
 import fs from "fs";
 const extract = require("extract-zip");
@@ -13,6 +12,7 @@ import { calculateSHA256ByPath, getAppDir } from "./fsManager";
 import axios from "axios";
 import { execute } from "async-execute";
 import { getSafeAppVersion } from "./electronHelpers";
+import taskManager from "./taskManager";
 
 initialize("A-EU-2276314363");
 
@@ -275,7 +275,7 @@ ipcMain.on("kill-process", async (_, { processId, appId }) => {
     }
 
     try {
-        await execute(`kill -9 ${processId}`);
+        await taskManager.killProcess(processId as number)
         trackEvent("feature.process-kill.success");
     } catch (e) {
         trackEvent("feature.process-kill.error", {
@@ -290,19 +290,15 @@ ipcMain.on("kill-process", async (_, { processId, appId }) => {
     }
 });
 
-ipcMain.on("open-process-path", (_, { processId }) => {
+ipcMain.on("open-process-path", async (_, { processId }) => {
     if (typeof processId !== "number") {
         return;
     }
 
-    exec(
-        `/usr/bin/open $(dirname $(ps -o comm= -p ${processId}))`,
-        (error, stdout, stderr) => {
-            console.info(error);
-        },
-    );
-
     trackEvent("feature.process-path");
+    await taskManager.openDirectoryInFinder(
+        await taskManager.getProcessDirectory(processId as number)
+    )
 });
 
 ipcMain.on("settings-button", () => {

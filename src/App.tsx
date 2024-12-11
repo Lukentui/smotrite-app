@@ -4,16 +4,16 @@ import Dashboard from "./screens/Dashboard";
 import TaskManager from "./screens/TaskManager";
 
 const App = (props: { tab: number }) => {
-  switch (props.tab) {
-    case 0:
-      return <Dashboard />;
+    switch (props.tab) {
+        case 0:
+            return <Dashboard />;
 
-    case 1:
-      return <TaskManager />;
-  }
+        case 1:
+            return <TaskManager />;
+    }
 
-  // return <TaskManager/>;
-  // return <Dashboard/>;
+    // return <TaskManager/>;
+    // return <Dashboard/>;
 };
 
 export default App;

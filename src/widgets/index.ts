@@ -7,11 +7,11 @@ import Network from "./Network";
 import SwapUsage from "./SwapUsage";
 
 export const WidgetsComponents = {
-  hardware: Hardware,
-  network: Network,
-  memory: Memory,
-  cpu: Cpu,
-  drives: Drives,
-  cpuTemperature: CpuTemperature,
-  swapUsage: SwapUsage,
+    hardware: Hardware,
+    network: Network,
+    memory: Memory,
+    cpu: Cpu,
+    drives: Drives,
+    cpuTemperature: CpuTemperature,
+    swapUsage: SwapUsage,
 };

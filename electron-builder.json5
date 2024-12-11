@@ -1,28 +1,28 @@
 {
-  $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  appId: "pro.nikkitin.smotrite",
-  asar: true,
-  productName: "Smotrite",
-  directories: {
-    output: "release/${version}",
-  },
-  buildVersion: "1.1.0",
-  copyright: "Luka Nikitin",
-  files: ["dist", "dist-electron", "bin"],
-  extraFiles: [
-    {
-      from: "bin",
-      to: "bin",
-      filter: ["**/*"],
+    $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+    appId: "pro.nikkitin.smotrite",
+    asar: true,
+    productName: "Smotrite",
+    directories: {
+        output: "release/${version}",
     },
-  ],
-  mac: {
-    target: [
-      {
-        target: "dmg",
-        arch: ["x64", "arm64"],
-      },
+    buildVersion: "1.1.0",
+    copyright: "Luka Nikitin",
+    files: ["dist", "dist-electron", "bin"],
+    extraFiles: [
+        {
+            from: "bin",
+            to: "bin",
+            filter: ["**/*"],
+        },
     ],
-    artifactName: "${productName}-Mac-${arch}-${version}-Installer.${ext}",
-  },
+    mac: {
+        target: [
+            {
+                target: "dmg",
+                arch: ["x64", "arm64"],
+            },
+        ],
+        artifactName: "${productName}-Mac-${arch}-${version}-Installer.${ext}",
+    },
 }

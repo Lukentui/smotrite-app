@@ -22,8 +22,9 @@ I made this app last weekend. Please note that it is currently in alpha and actu
 
 ## Todo
 
-- Refactor
-- i18n
+-   Refactor
+-   i18n
 
 ## Credits
+
 https://github.com/narugit/smctemp

@@ -13,6 +13,7 @@ dist-ssr
 dist-electron
 release
 *.local
+report.xml
 
 # Editor directories and files
 .vscode/*

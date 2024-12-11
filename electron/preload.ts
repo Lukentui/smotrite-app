@@ -1,3 +1,4 @@
+import { trackEvent } from "@aptabase/electron/main";
 import { contextBridge, ipcRenderer } from "electron";
 import { ipcMain } from "electron/main";
 
@@ -202,13 +203,17 @@ contextBridge.exposeInMainWorld("api", {
   send: (event: string, ...args: any[]) => {
     ipcRenderer.send(event, ...args);
   },
-  allUpdatesProcessed: () => removeLoading(),
 });
 
-ipcRenderer.on("removeLoading", () => removeLoading());
+ipcRenderer.on("removeLoading", () => {
+  trackEvent("app.loaded");
+  removeLoading()
+});
 ipcRenderer.on("setLoadingMessage", (_, v) => {
-  console.log(v)
   setMessageLoading(v)
+  trackEvent("app.loading-message", {
+    text: v
+  });
 });
 
 // window.onmessage = ev => {

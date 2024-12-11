@@ -1,16 +1,9 @@
-import {
-  app,
-  BrowserWindow,
-  ipcMain,
-  net,
-  protocol,
-  dialog,
-} from "electron";
+import { app, BrowserWindow, ipcMain, net, protocol, dialog } from "electron";
 import path from "node:path";
 require("@electron/remote/main").initialize();
 const { exec } = require("node:child_process");
 import { initialize, trackEvent } from "@aptabase/electron/main";
-import fs from 'fs';
+import fs from "fs";
 const extract = require("extract-zip");
 import dayjs from "dayjs";
 import collectors from "./collectors";
@@ -101,81 +94,122 @@ function createWindow() {
     // backgroundMaterial: 'mica'
   });
 
-  win.webContents.once('dom-ready', async () => {
-      if(fs.existsSync(getAppDir() + '/.binaries_ok_' + getSafeAppVersion())) {
-        win?.webContents.send("setLoadingMessage", `A little more...`)
-        metricsUpdatesLoop();
-        setTimeout(() => win?.webContents.send("removeLoading"), 500);
-        return;
+  win.webContents.once("dom-ready", async () => {
+    trackEvent("app.dom-ready");
+
+    if (fs.existsSync(getAppDir() + "/.binaries_ok_" + getSafeAppVersion())) {
+      trackEvent("app.loading-binaries-ok");
+      win?.webContents.send("setLoadingMessage", `A little more...`);
+      metricsUpdatesLoop();
+      setTimeout(() => win?.webContents.send("removeLoading"), 500);
+      return;
+    }
+
+    trackEvent("app.loading-binaries-download");
+
+    // clean cache folder
+    fs.readdirSync(getAppDir()).forEach((f) =>
+      fs.rmSync(`${getAppDir()}/${f}`),
+    );
+
+    try {
+      const releaseInfo = await axios.get(
+        `https://api.github.com/repos/Lukentui/smotrite-app/releases/tags/${app.isPackaged ? app.getVersion() : "alpha"}`,
+      );
+
+      if (
+        !releaseInfo.data?.assets?.some(
+          (asset) => asset.name === "binaries.zip.sha256-checksum",
+        )
+      ) {
+        throw new Error(
+          "Release does not include required file: binaries.zip.sha256-checksum",
+        );
       }
 
-      // clean cache folder
-      fs.readdirSync(getAppDir()).forEach(f => fs.rmSync(`${getAppDir()}/${f}`));
-      
-      try {
-        const releaseInfo = await axios.get(`https://api.github.com/repos/Lukentui/smotrite-app/releases/tags/${app.isPackaged ? app.getVersion() : 'alpha'}`);
-        
-
-        if(!releaseInfo.data?.assets?.some(asset => asset.name === 'binaries.zip.sha256-checksum')) {
-          throw new Error('Release does not include required file: binaries.zip.sha256-checksum')
-        }
-
-        if(!releaseInfo.data?.assets?.some(asset => asset.name === 'binaries.zip')) {
-          throw new Error('Release does not include required file: binaries.zip')
-        }
-      } catch(e) {
-        dialog.showMessageBox(win, {
-          type: 'error',
-          buttons: ['OK'],
-          title: 'Unable to download required binaries!',
-          message: `Unable to download required binaries! Version: ${app.isPackaged ? app.getVersion() : 'alpha'}. Error: ${String(e)}`,
-      });
-        win?.webContents.send("setLoadingMessage", `Unable to download required binaries!`)
-        return;
+      if (
+        !releaseInfo.data?.assets?.some(
+          (asset) => asset.name === "binaries.zip",
+        )
+      ) {
+        throw new Error("Release does not include required file: binaries.zip");
       }
-
-      const downloader = new Downloader({
-        url: `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : 'alpha'}/binaries.zip`,
-        // url: "https://github.com/Lukentui/smotrite-app/releases/download/alpha/binaries.zip",
-        directory: getAppDir(),
-        fileName: 'binaries.zip',
-        onProgress: function (percentage) {
-          log.info(`Loading binaries: ${percentage}%`);
-          win?.webContents.send("setLoadingMessage", `Loading binaries: ${percentage}%`)
-        },
+    } catch (e) {
+      dialog.showMessageBox(win, {
+        type: "error",
+        buttons: ["OK"],
+        title: "Unable to download required binaries!",
+        message: `Unable to download required binaries! Version: ${app.isPackaged ? app.getVersion() : "alpha"}. Error: ${String(e)}`,
       });
-    
-      try {
-        log.info('downloading binaries...');
-        await downloader.download();
-        log.info('downloaded!');
+      win?.webContents.send(
+        "setLoadingMessage",
+        `Unable to download required binaries!`,
+      );
+      trackEvent("app.loading-binaries-failed");
+      return;
+    }
 
-        win?.webContents.send("setLoadingMessage", `Validating checksums...`)
-        const downloadedChecksum = await calculateSHA256ByPath(getAppDir() + "/binaries.zip");
-                                                  // `https://github.com/Lukentui/smotrite-app/releases/download/${app.getVersion()}/binaries.zip.sha256-checksum`,
-        const expectedChecksum = (await axios.get(
+    const downloader = new Downloader({
+      url: `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : "alpha"}/binaries.zip`,
+      // url: "https://github.com/Lukentui/smotrite-app/releases/download/alpha/binaries.zip",
+      directory: getAppDir(),
+      fileName: "binaries.zip",
+      onProgress: function (percentage) {
+        log.info(`Loading binaries: ${percentage}%`);
+        win?.webContents.send(
+          "setLoadingMessage",
+          `Loading binaries: ${percentage}%`,
+        );
+      },
+    });
+
+    try {
+      log.info("downloading binaries...");
+      await downloader.download();
+      log.info("downloaded!");
+
+      win?.webContents.send("setLoadingMessage", `Validating checksums...`);
+      const downloadedChecksum = await calculateSHA256ByPath(
+        getAppDir() + "/binaries.zip",
+      );
+      // `https://github.com/Lukentui/smotrite-app/releases/download/${app.getVersion()}/binaries.zip.sha256-checksum`,
+      const expectedChecksum = (
+        await axios.get(
           // 'https://github.com/Lukentui/smotrite-app/releases/download/alpha/binaries.zip.sha256-checksum'
-          `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : 'alpha'}/binaries.zip.sha256-checksum`
-        )).data.trim()
-        
-        log.log(`checksums: ${downloadedChecksum.substring(0, 6)}:${expectedChecksum.substring(0, 6)}`)
-        if(downloadedChecksum !== expectedChecksum) {
-          throw new Error(`Bad binaries checksum: ${downloadedChecksum}`)
-        }
+          `https://github.com/Lukentui/smotrite-app/releases/download/${app.isPackaged ? app.getVersion() : "alpha"}/binaries.zip.sha256-checksum`,
+        )
+      ).data.trim();
 
-        win?.webContents.send("setLoadingMessage", `Extracting binaries...`)
-        extract(getAppDir() + '/binaries.zip', { dir: getAppDir() })
-        win?.webContents.send("setLoadingMessage", `A little more...`)
-        metricsUpdatesLoop();
-        setTimeout(() => win?.webContents.send("removeLoading"), 1000);
-        fs.writeFileSync(getAppDir() + '/.binaries_ok_' + getSafeAppVersion(), '');
-      } catch (error) {
-        // todo show error on loading screen
-        log.error('Unable to initialize binaries: ' + error);
+      log.log(
+        `checksums: ${downloadedChecksum.substring(0, 6)}:${expectedChecksum.substring(0, 6)}`,
+      );
+      if (downloadedChecksum !== expectedChecksum) {
+        throw new Error(`Bad binaries checksum: ${downloadedChecksum}`);
       }
+
+      win?.webContents.send("setLoadingMessage", `Extracting binaries...`);
+      extract(getAppDir() + "/binaries.zip", { dir: getAppDir() });
+      win?.webContents.send("setLoadingMessage", `A little more...`);
+      metricsUpdatesLoop();
+      setTimeout(() => win?.webContents.send("removeLoading"), 1000);
+      fs.writeFileSync(
+        getAppDir() + "/.binaries_ok_" + getSafeAppVersion(),
+        "",
+      );
+    } catch (error) {
+      // todo show error on loading screen
+      log.error("Unable to initialize binaries: " + error);
+      dialog.showMessageBox(win, {
+        type: "error",
+        buttons: ["OK"],
+        title: "Unable to download required binaries!",
+        message: `Unable to download required binaries(post-verify)! Version: ${app.isPackaged ? app.getVersion() : "alpha"}. Error: ${String(error)}`,
+      });
+      trackEvent("app.loading-binaries-failed");
+    }
   });
 
-  if(!app.isPackaged) {
+  if (!app.isPackaged) {
     win.webContents.openDevTools();
   }
 
@@ -233,11 +267,11 @@ ipcMain.on("kill-process", async (_, { processId, appId }) => {
   try {
     await execute(`kill -9 ${processId}`);
     trackEvent("feature.process-kill.success");
-  } catch(e) {
+  } catch (e) {
     trackEvent("feature.process-kill.error", {
-      reason: String(e)
+      reason: String(e),
     });
-    
+
     win?.webContents.send("kill-process-error", {
       processId,
       appId,

@@ -6,14 +6,26 @@ import fs from "fs/promises";
 export default {
     updatesHeapId: "hwInfoUpdate",
     name: "HW Info",
-    executionCondition: (timestamp: string) => 2 % 10 === 0,
+    executionCondition: (timestamp: number) => timestamp % 10 === 0,
     collect: async (
         app: App,
     ): Promise<Record<string, any> & { successful: boolean }> => {
         try {
             const file = await fs.readFile("/tmp/smotrite-hw.json");
+
+            const stats = await fs.stat("/tmp/smotrite-hw.json");
+
+            const now = Date.now();
+            const diffMs = now - stats.mtimeMs;
+
+            if(diffMs > 60_000) {
+                await fs.unlink("/tmp/smotrite-hw.json");
+            }
+            
             return JSON.parse(file.toString());
         } catch {}
+
+        console.info("HW INFO");
 
         const os = await si.osInfo();
         const cpu = await si.cpu();

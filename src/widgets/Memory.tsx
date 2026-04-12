@@ -1,4 +1,3 @@
-import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/solid";
 import {
     Badge,
     Card,
@@ -8,7 +7,6 @@ import {
     Text,
     Metric,
 } from "@tremor/react";
-import { useMemo } from "react";
 
 export default (
     props: CardProps &
@@ -18,6 +16,7 @@ export default (
             loading?: boolean;
         },
 ) => {
+    console.info(324234, props?.updatesHeap?.memory)
     return (
         <div {...props} style={{ position: "relative" }}>
             {" "}

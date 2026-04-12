@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "react-tooltip/dist/react-tooltip.css";
 import { ArrowDownIcon, CogIcon, RefreshIcon } from "@heroicons/react/outline";
 import { Button } from "@tremor/react";
+import { electronApi } from "./lib/electronApi";
 // import * as Store from 'electron-store'
+
 
 const RootWrapper = () => {
     const [active, setActive] = useState(
         localStorage.getItem("tab") ? Number(localStorage.getItem("tab")) : 0,
     );
+
+    // useEffect(() => {
+    //     const unsubscribe = electronApi.on("debugAppResourceUsage", (message) => {
+    //         setDebug(JSON.stringify(message))
+    //     });
+
+    //     return () => unsubscribe()
+    // }, [])
 
     return (
         <>
@@ -19,11 +29,11 @@ const RootWrapper = () => {
                     <div className="macos-buttons">
                         <span
                             className="macos-buttons_items"
-                            onClick={() => (window as any).api.send("close")}
+                            onClick={() => electronApi.send("close")}
                         ></span>
                         <span
                             className="macos-buttons_items"
-                            onClick={() => (window as any).api.send("minimize")}
+                            onClick={() => electronApi.send("minimize")}
                         ></span>
                         <span className="macos-buttons_items"></span>
                     </div>
@@ -76,9 +86,7 @@ const RootWrapper = () => {
 
                     <div
                         className="toolbar-drag-button"
-                        onClick={() =>
-                            (window as any).api.send("settings-button")
-                        }
+                        onClick={() => electronApi.send("settings-button")}
                     >
                         <svg
                             width={20}
@@ -124,8 +132,3 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
 // Remove Preload scripts loading
 postMessage({ payload: "removeLoading" }, "*");
-
-// Use contextBridge
-window.ipcRenderer.on("main-process-message", (_event, message) => {
-    console.log(message);
-});

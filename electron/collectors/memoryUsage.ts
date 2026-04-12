@@ -5,6 +5,7 @@ export default {
     updatesHeapId: "memoryUsage",
     name: "Memory usage",
     executionCondition: (timestamp: number) => timestamp % 2 === 0,
+    debugLog: true,
     collect: async (
         _: App,
     ): Promise<Record<string, any> & { successful: boolean }> => ({

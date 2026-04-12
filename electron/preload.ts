@@ -1,9 +1,17 @@
-import { trackEvent } from "@aptabase/electron/main";
+import { trackEvent } from "@aptabase/electron/renderer";
 import { contextBridge, ipcRenderer } from "electron";
-import { ipcMain } from "electron/main";
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld("ipcRenderer", withPrototype(ipcRenderer));
+contextBridge.exposeInMainWorld("api", {
+  on: (event: string, func: any) => {
+    ipcRenderer.on(event, (_, v) => func(v));
+  },
+  send: (event: string, ...args: any[]) => {
+    ipcRenderer.send(event, ...args);
+  },
+  allUpdatesProcessed: () => removeLoading(),
+});
 
 // `exposeInMainWorld` can't detect attributes and methods of `prototype`, manually patching it.
 function withPrototype(obj: Record<string, any>) {
@@ -193,27 +201,27 @@ function useLoading() {
 
 // ----------------------------------------------------------------------
 
-const { appendLoading, removeLoading, setMessageLoading } = useLoading();
-domReady().then(appendLoading);
+let appendLoading = () => {};
+let removeLoading = () => {};
+let setMessageLoading = (_msg: string) => {};
 
-contextBridge.exposeInMainWorld("api", {
-  on: (event: string, func: any) => {
-    ipcRenderer.on(event, (_, v) => func(v));
-  },
-  send: (event: string, ...args: any[]) => {
-    ipcRenderer.send(event, ...args);
-  },
-});
+try {
+  const loadingApi = useLoading();
+  appendLoading = loadingApi.appendLoading;
+  removeLoading = loadingApi.removeLoading;
+  setMessageLoading = loadingApi.setMessageLoading;
+  domReady().then(appendLoading);
+} catch (error) {
+  console.error("[preload] Failed to initialize loading UI", error);
+}
 
 ipcRenderer.on("removeLoading", () => {
   trackEvent("app.loaded");
   removeLoading()
 });
 ipcRenderer.on("setLoadingMessage", (_, v) => {
+  console.log(v)
   setMessageLoading(v)
-  trackEvent("app.loading-message", {
-    text: v
-  });
 });
 
 // window.onmessage = ev => {

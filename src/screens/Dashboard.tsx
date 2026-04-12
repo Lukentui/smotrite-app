@@ -8,6 +8,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import moment from "moment";
 import React from "react";
 import { WidgetsComponents } from "./../widgets";
+import { electronApi } from "../lib/electronApi";
 
 const defaultLayout = {
     right: ["hardware", "network", "cpuTemperature"],
@@ -31,7 +32,10 @@ export default () => {
     const [layoutUpdate, setLayoutUpdate] = useState(0);
 
     useEffect(() => {
-        (window as any).api.on("memoryUpdate", (data: any) => {
+        // todo refactor
+        // эту хуйню надо убрать и автоматизировать, чтоб оно само это делало,
+        // а не руками хуярить под каждый коллектор on, on, on, on
+        electronApi.on("memoryUsage", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 memory: {
@@ -51,7 +55,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("cpuTemperatureUpdate", (data: any) => {
+        electronApi.on("cpuTemperatureUpdate", (data: any) => {
             console.warn(5555, data);
             updatesHeap.current = {
                 ...updatesHeap.current,
@@ -67,7 +71,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("cpuUpdate", (data: any) => {
+        electronApi.on("cpuUpdate", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 cpu: {
@@ -89,7 +93,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("hwInfoUpdate", (data: any) => {
+        electronApi.on("hwInfoUpdate", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 hardware: data,
@@ -102,7 +106,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("networkUpdate", (data: any) => {
+        electronApi.on("networkUpdate", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 network: data,
@@ -115,7 +119,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("drivesIOUpdate", (data: any) => {
+        electronApi.on("drivesIOUpdate", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 drivesIO: data,
@@ -128,7 +132,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("drivesLayoutUpdate", (data: any) => {
+        electronApi.on("drivesLayoutUpdate", (data: any) => {
             updatesHeap.current = {
                 ...updatesHeap.current,
                 drivesLayout: data,
@@ -141,7 +145,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("processListUpdate", (data: any) => {
+        electronApi.on("processListUpdate", (data: any) => {
             // console.info(data)
             updatesHeap.current = {
                 ...updatesHeap.current,
@@ -155,7 +159,7 @@ export default () => {
             setLayoutUpdate(+new Date());
         });
 
-        (window as any).api.on("swapUpdate", (data: any) => {
+        electronApi.on("swapUpdate", (data: any) => {
             // console.info(data)
             updatesHeap.current = {
                 ...updatesHeap.current,

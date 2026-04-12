@@ -8,6 +8,7 @@ import { Grid } from "@tremor/react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "../assets/task-manager.sass";
 import { humanFileSize } from "../helpers";
+import { electronApi } from "../lib/electronApi";
 
 const iconPlaceHolder =
     "data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP89B8AAukB8/71MdcAAAAASUVORK5CYII=";
@@ -107,13 +108,13 @@ export default () => {
     );
 
     useEffect(() => {
-        (window as any).api.on("processListUpdate", (data: any) => {
+        electronApi.on("processListUpdate", (data: any) => {
             if (!liveUpdates) return;
             setTasks(data);
             localStorage.setItem("taskmanagerTasks", JSON.stringify(data));
         });
 
-        (window as any).api.on("kill-process-error", (data: any) => {
+        electronApi.on("kill-process-error", (data: any) => {
             setAlternativeTooltipContent({
                 ...alternativeTooltipContent,
                 [data.appId]: data.error,
@@ -144,7 +145,7 @@ export default () => {
         setSort({ column, direction: viseVersaDirection(sort.direction) });
 
     const handleOpenFolder = (item: any) => {
-        (window as any).api.send("open-process-path", { processId: item.pid });
+        electronApi.send("open-process-path", { processId: item.pid });
     };
 
     const handleKill = (item: any) => {
@@ -155,7 +156,7 @@ export default () => {
             [appId]: "Signal sent, please wait...",
         });
 
-        (window as any).api.send("kill-process", {
+        electronApi.send("kill-process", {
             processId: item.pid,
             appId,
         });

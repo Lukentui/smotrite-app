@@ -29,4 +29,4 @@ I made this app last weekend. Please note that it is currently in alpha and actu
 https://github.com/narugit/smctemp
 
 
-Made with Love by [Luka Nikitin](https://nikkitin.pro/)
+❤️ Made with Love by [Luka Nikitin](https://nikkitin.pro/)
